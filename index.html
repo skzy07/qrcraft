@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,107 +8,350 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
+
+  :root[data-theme="dark"] {
     --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26;
     --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13);
-    --accent: #7c6dfa; --accent2: #c084fc; --text: #f0f0f8; --muted: #8888aa;
+    --text: #f0f0f8; --muted: #8888aa;
+    --grid-line: rgba(124,109,250,0.03);
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f5fa; --surface: #ffffff; --surface2: #f0f0f8;
+    --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.13);
+    --text: #0a0a0f; --muted: #666688;
+    --grid-line: rgba(124,109,250,0.05);
+  }
+  :root {
+    --accent: #7c6dfa; --accent2: #c084fc;
     --radius: 16px; --radius-sm: 10px;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh; overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
   body::before {
     content: ''; position: fixed; inset: 0;
-    background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px);
+    background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 40px 40px; pointer-events: none; z-index: 0;
   }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(124,109,250,0.4); } 50% { box-shadow: 0 0 0 8px rgba(124,109,250,0); } }
+  @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .anim-fade-up { animation: fadeUp 0.5s ease both; }
+  .anim-fade-up-1 { animation: fadeUp 0.5s 0.1s ease both; }
+  .anim-fade-up-2 { animation: fadeUp 0.5s 0.2s ease both; }
+  .anim-fade-up-3 { animation: fadeUp 0.5s 0.3s ease both; }
+  .anim-scale { animation: scaleIn 0.4s ease both; }
+
+  /* NAV */
   nav {
     position: relative; z-index: 10;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 40px; border-bottom: 1px solid var(--border);
+    padding: 16px 36px;
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.4s ease both;
   }
-  .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
+
+  .logo {
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    background: linear-gradient(135deg, #7c6dfa, #c084fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-decoration: none; letter-spacing: -0.5px;
+    transition: opacity 0.2s;
+  }
+  .logo:hover { opacity: 0.8; }
+
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+
   .nav-plan { background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.25); color: #a78bfa; font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 100px; }
   .nav-plan.premium { background: rgba(192,132,252,0.1); border-color: rgba(192,132,252,0.3); color: #c084fc; }
-  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: border-color 0.2s; }
-  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; }
-  .hero { position: relative; z-index: 10; text-align: center; padding: 48px 20px 36px; }
-  .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(30px, 5vw, 52px); font-weight: 800; line-height: 1.05; letter-spacing: -2px; margin-bottom: 12px; }
-  .hero h1 span { background: linear-gradient(135deg, #7c6dfa 0%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { font-size: 17px; color: var(--muted); font-weight: 300; }
+
+  .nav-btn {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 7px 14px; cursor: pointer; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; transform: translateY(-1px); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text); font-size: 16px;
+    width: 36px; height: 36px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .theme-toggle:hover { border-color: var(--accent); transform: rotate(20deg); }
+
+  /* LANG TOGGLE */
+  .lang-toggle {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+    padding: 7px 10px; cursor: pointer; letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+  .lang-toggle:hover { border-color: var(--accent); color: #a78bfa; }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 10;
+    text-align: center; padding: 52px 20px 36px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: rgba(124,109,250,0.1); border: 1px solid rgba(124,109,250,0.25);
+    color: #a78bfa; font-size: 11px; font-weight: 500; letter-spacing: 2px;
+    text-transform: uppercase; padding: 6px 16px; border-radius: 100px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5vw, 52px); font-weight: 800;
+    line-height: 1.05; letter-spacing: -2px; margin-bottom: 12px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, #7c6dfa 0%, #c084fc 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .hero p {
+    font-size: 16px; color: var(--muted); font-weight: 300;
+    animation: fadeUp 0.5s 0.2s ease both;
+  }
 
   /* LIMIT BAR */
   .limit-bar {
     position: relative; z-index: 10;
-    max-width: 1100px; margin: 0 auto 16px; padding: 0 24px;
+    max-width: 1060px; margin: 0 auto 16px; padding: 0 24px;
+    animation: fadeUp 0.5s 0.25s ease both;
   }
   .limit-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 14px 20px;
+    border-radius: var(--radius-sm); padding: 12px 18px;
     display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    transition: background 0.3s, border-color 0.3s;
   }
-  .limit-left { display: flex; align-items: center; gap: 12px; }
-  .limit-dots { display: flex; gap: 6px; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.used { background: var(--accent); }
+  .limit-left { display: flex; align-items: center; gap: 10px; }
+  .limit-dots { display: flex; gap: 5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; transition: background 0.3s; }
+  .dot.used { background: var(--accent); animation: pulse 2s infinite; }
   .dot.empty { background: var(--surface2); border: 1px solid var(--border2); }
   .limit-text { font-size: 13px; color: var(--muted); }
   .limit-text strong { color: var(--text); }
-  .btn-upgrade-small { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 14px; cursor: pointer; white-space: nowrap; text-decoration: none; transition: opacity 0.2s; }
-  .btn-upgrade-small:hover { opacity: 0.85; }
+  .btn-upgrade-small {
+    background: linear-gradient(135deg, #7c6dfa, #c084fc);
+    border: none; border-radius: 8px; color: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+    padding: 7px 14px; cursor: pointer; white-space: nowrap; text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn-upgrade-small:hover { opacity: 0.85; transform: translateY(-1px); }
 
-  .main { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: 1fr 400px; gap: 20px; align-items: start; }
-  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  /* MAIN */
+  .main {
+    position: relative; z-index: 10;
+    max-width: 1060px; margin: 0 auto;
+    padding: 0 24px 80px;
+    display: grid; grid-template-columns: 1fr 390px; gap: 18px; align-items: start;
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;
+    transition: background 0.3s, border-color 0.3s;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
   .panel:last-child { margin-bottom: 0; }
-  .panel-header { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-  .panel-icon { width: 30px; height: 30px; background: rgba(124,109,250,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-  .panel-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
-  .panel-body { padding: 20px 22px; }
-  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 18px; }
-  .type-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; padding: 9px 4px; cursor: pointer; transition: all 0.15s; text-align: center; }
-  .type-btn:hover { border-color: var(--accent); color: var(--text); }
+  .panel:hover { border-color: var(--border2); }
+
+  .panel-header {
+    padding: 16px 20px 13px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 9px;
+  }
+  .panel-icon {
+    width: 28px; height: 28px; background: rgba(124,109,250,0.15);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .panel-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: -0.2px; }
+  .panel-body { padding: 18px 20px; }
+
+  /* TYPE GRID */
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+  .type-btn {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+    padding: 9px 4px; cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .type-btn:hover:not(.locked) { border-color: var(--accent); color: var(--text); transform: translateY(-2px); }
   .type-btn.active { background: rgba(124,109,250,0.12); border-color: var(--accent); color: #a78bfa; }
-  .type-btn.locked { opacity: 0.4; cursor: not-allowed; position: relative; }
-  .type-icon { font-size: 16px; display: block; margin-bottom: 3px; }
-  .field { margin-bottom: 16px; }
+  .type-btn.locked { opacity: 0.35; cursor: not-allowed; }
+  .type-icon { font-size: 15px; display: block; margin-bottom: 3px; }
+
+  /* FORM */
+  .field { margin-bottom: 14px; }
   .field:last-child { margin-bottom: 0; }
-  label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 7px; }
-  input[type="text"], input[type="url"], textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 11px 14px; outline: none; transition: border-color 0.2s; }
-  input:focus, textarea:focus { border-color: rgba(124,109,250,0.5); box-shadow: 0 0 0 3px rgba(124,109,250,0.1); }
-  textarea { resize: none; min-height: 72px; line-height: 1.5; }
-  .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .color-field { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: 9px 12px; display: flex; align-items: center; gap: 9px; cursor: pointer; }
-  .color-swatch { width: 26px; height: 26px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; cursor: pointer; overflow: hidden; position: relative; }
-  .color-swatch input[type="color"] { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); opacity: 0; cursor: pointer; border: none; padding: 0; }
+  label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+  input[type="text"], input[type="url"], textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    padding: 11px 14px; outline: none; transition: all 0.2s;
+  }
+  input:focus, textarea:focus {
+    border-color: rgba(124,109,250,0.5);
+    box-shadow: 0 0 0 3px rgba(124,109,250,0.1);
+    transform: translateY(-1px);
+  }
+  textarea { resize: none; min-height: 70px; line-height: 1.5; }
+
+  /* COLORS */
+  .color-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .color-field {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); padding: 9px 12px;
+    display: flex; align-items: center; gap: 9px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .color-field:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .color-swatch {
+    width: 26px; height: 26px; border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0; overflow: hidden; position: relative;
+  }
+  .color-swatch input[type="color"] { position: absolute; inset: -4px; width: calc(100%+8px); height: calc(100%+8px); opacity: 0; cursor: pointer; border: none; padding: 0; }
   .color-label { font-size: 12px; color: var(--muted); }
   .color-value { font-size: 11px; color: var(--text); font-family: monospace; }
-  .locked-overlay { position: relative; }
-  .locked-overlay::after { content: '🔒 Premium'; position: absolute; inset: 0; background: rgba(10,10,15,0.8); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #a78bfa; font-weight: 500; }
-  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+
+  /* SLIDER */
+  .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
   input[type="range"] { -webkit-appearance: none; width: 100%; height: 4px; background: var(--surface2); border-radius: 2px; outline: none; border: none; padding: 0; }
-  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; box-shadow: 0 0 8px rgba(124,109,250,0.4); transition: transform 0.15s; }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
   .slider-val { font-size: 13px; font-weight: 500; color: var(--text); min-width: 40px; text-align: right; }
-  .btn-generate { width: 100%; background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; border-radius: var(--radius-sm); color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 15px; cursor: pointer; margin-top: 6px; transition: opacity 0.2s, transform 0.15s; }
-  .btn-generate:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-  .preview-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); position: sticky; top: 20px; }
-  .qr-display { padding: 28px; display: flex; align-items: center; justify-content: center; min-height: 280px; }
-  .qr-placeholder { text-align: center; color: var(--muted); font-size: 14px; }
-  .qr-placeholder-icon { font-size: 48px; display: block; margin-bottom: 12px; opacity: 0.3; }
-  #qr-output { display: none; flex-direction: column; align-items: center; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-  #qr-canvas-wrapper { border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative; }
-  .download-section { padding: 0 20px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .btn-dl { background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; padding: 10px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
-  .btn-dl:hover { border-color: var(--accent); color: #a78bfa; background: rgba(124,109,250,0.08); }
-  .premium-banner { margin: 0 20px 20px; background: linear-gradient(135deg, rgba(124,109,250,0.1), rgba(192,132,252,0.08)); border: 1px solid rgba(124,109,250,0.25); border-radius: var(--radius-sm); padding: 14px; display: flex; align-items: center; gap: 10px; }
+
+  /* GENERATE BTN */
+  .btn-generate {
+    width: 100%; background: linear-gradient(135deg, #7c6dfa, #c084fc);
+    border: none; border-radius: var(--radius-sm); color: #fff;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    padding: 15px; cursor: pointer; margin-top: 4px;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .btn-generate::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .btn-generate:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,109,250,0.35); }
+  .btn-generate:hover::after { opacity: 1; }
+  .btn-generate:active { transform: translateY(0); }
+  .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* PREVIEW */
+  .preview-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); position: sticky; top: 20px;
+    transition: background 0.3s, border-color 0.3s;
+    animation: fadeUp 0.5s 0.4s ease both;
+  }
+  .preview-panel:hover { border-color: var(--border2); }
+
+  .qr-display {
+    padding: 28px; display: flex;
+    align-items: center; justify-content: center; min-height: 270px;
+  }
+  .qr-placeholder { text-align: center; color: var(--muted); }
+  .qr-placeholder-icon { font-size: 44px; display: block; margin-bottom: 10px; opacity: 0.25; animation: float 3s ease-in-out infinite; }
+  .qr-placeholder p { font-size: 13px; line-height: 1.5; }
+
+  #qr-output { display: none; flex-direction: column; align-items: center; }
+  #qr-output.visible { display: flex; animation: scaleIn 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+
+  #qr-canvas-wrapper {
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    transition: box-shadow 0.3s;
+  }
+  #qr-canvas-wrapper:hover { box-shadow: 0 20px 60px rgba(124,109,250,0.2); }
+
+  #qrcode canvas { display: block !important; border-radius: 4px; }
+  #qrcode img { display: none !important; }
+
+  .qr-name-row { padding: 0 18px 14px; }
+  .qr-name-input {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 8px 12px; outline: none; transition: all 0.2s;
+  }
+  .qr-name-input:focus { border-color: rgba(124,109,250,0.4); color: var(--text); }
+
+  .download-section { padding: 0 18px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-dl {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    padding: 10px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .btn-dl:hover { border-color: var(--accent); color: #a78bfa; background: rgba(124,109,250,0.08); transform: translateY(-1px); }
+  .btn-dl:active { transform: translateY(0); }
+
+  .premium-banner {
+    margin: 0 18px 18px;
+    background: linear-gradient(135deg, rgba(124,109,250,0.08), rgba(192,132,252,0.06));
+    border: 1px solid rgba(124,109,250,0.2);
+    border-radius: var(--radius-sm); padding: 12px;
+    display: flex; align-items: center; gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .premium-banner:hover { border-color: rgba(124,109,250,0.4); }
   .premium-text strong { font-size: 12px; font-weight: 600; color: #a78bfa; display: block; }
   .premium-text span { font-size: 11px; color: var(--muted); }
-  .qr-name-row { padding: 0 20px 16px; }
-  .qr-name-input { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 8px 12px; outline: none; }
-  .qr-name-input:focus { border-color: rgba(124,109,250,0.4); color: var(--text); }
-  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--surface); border: 1px solid rgba(124,109,250,0.4); border-radius: 10px; padding: 12px 18px; font-size: 13px; color: #a78bfa; box-shadow: 0 8px 32px rgba(0,0,0,0.4); z-index: 1000; transform: translateY(80px); opacity: 0; transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  @media (max-width: 800px) { .main { grid-template-columns: 1fr; } nav { padding: 14px 16px; } .preview-panel { position: static; } .hero { padding: 32px 16px 24px; } .limit-bar { padding: 0 16px; } }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--surface); border: 1px solid rgba(124,109,250,0.4);
+    border-radius: 10px; padding: 12px 18px;
+    font-size: 13px; color: #a78bfa;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3); z-index: 1000;
+    transform: translateY(80px) scale(0.9); opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+
+  @media (max-width: 800px) {
+    .main { grid-template-columns: 1fr; }
+    nav { padding: 14px 16px; }
+    .preview-panel { position: static; }
+    .hero { padding: 32px 16px 24px; }
+  }
 </style>
 </head>
 <body>
@@ -116,96 +359,97 @@
 <nav>
   <a href="index.html" class="logo">QRcraft</a>
   <div class="nav-right">
-    <span class="nav-plan" id="nav-plan">Grátis</span>
-    <a href="dashboard.html" class="nav-btn">Os meus QR codes</a>
-    <button class="nav-btn" id="btn-logout" onclick="logout()" style="display:none">Sair</button>
-    <a href="login.html" class="nav-btn" id="btn-login-nav">Entrar</a>
+    <span class="nav-plan" id="nav-plan" style="display:none"></span>
+    <button class="lang-toggle" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <a href="dashboard.html" class="nav-btn" id="nav-dashboard" style="display:none"></a>
+    <button class="nav-btn" id="btn-logout" onclick="logout()" style="display:none"></button>
+    <a href="login.html" class="nav-btn" id="btn-login-nav"></a>
   </div>
 </nav>
 
 <div class="hero">
-  <h1>Cria QR codes<br><span>bonitos e profissionais</span></h1>
-  <p>3 grátis por dia · QR dinâmicos com plano premium</p>
+  <div class="hero-tag" data-i18n="hero_tag"></div>
+  <h1><span data-i18n="hero_title"></span><br><span data-i18n="hero_title_accent" style="background:linear-gradient(135deg,#7c6dfa,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent"></span></h1>
+  <p data-i18n="hero_sub"></p>
 </div>
 
-<!-- LIMIT BAR -->
 <div class="limit-bar" id="limit-bar" style="display:none">
   <div class="limit-card">
     <div class="limit-left">
       <div class="limit-dots" id="limit-dots"></div>
-      <div class="limit-text"><strong id="limit-count">0/3</strong> QR codes hoje</div>
+      <div class="limit-text"><strong id="limit-count"></strong> <span data-i18n="limit_today"></span></div>
     </div>
-    <a href="pricing.html" class="btn-upgrade-small">⚡ Upgrade</a>
+    <a href="pricing.html" class="btn-upgrade-small" data-i18n="upgrade"></a>
   </div>
 </div>
 
 <div class="main">
   <div>
-    <!-- TIPO -->
     <div class="panel">
       <div class="panel-header">
         <div class="panel-icon">📋</div>
-        <span class="panel-title">Tipo de conteúdo</span>
+        <span class="panel-title" data-i18n="content_type"></span>
       </div>
       <div class="panel-body">
         <div class="type-grid">
-          <button class="type-btn active" data-type="url" onclick="setType('url', this)"><span class="type-icon">🌐</span>URL</button>
-          <button class="type-btn" data-type="text" onclick="setType('text', this)"><span class="type-icon">✏️</span>Texto</button>
-          <button class="type-btn" data-type="email" onclick="setType('email', this)"><span class="type-icon">📧</span>Email</button>
-          <button class="type-btn" data-type="phone" onclick="setType('phone', this)"><span class="type-icon">📞</span>Telefone</button>
-          <button class="type-btn locked" title="Premium" onclick="requirePremium()"><span class="type-icon">📶</span>WiFi</button>
-          <button class="type-btn locked" title="Premium" onclick="requirePremium()"><span class="type-icon">👤</span>Contacto</button>
-          <button class="type-btn locked" title="Premium" onclick="requirePremium()"><span class="type-icon">💬</span>SMS</button>
-          <button class="type-btn locked" title="Premium" onclick="requirePremium()"><span class="type-icon">📍</span>Local</button>
+          <button class="type-btn active" data-type="url" onclick="setType('url',this)"><span class="type-icon">🌐</span><span data-i18n="type_url"></span></button>
+          <button class="type-btn" data-type="text" onclick="setType('text',this)"><span class="type-icon">✏️</span><span data-i18n="type_text"></span></button>
+          <button class="type-btn" data-type="email" onclick="setType('email',this)"><span class="type-icon">📧</span><span data-i18n="type_email"></span></button>
+          <button class="type-btn" data-type="phone" onclick="setType('phone',this)"><span class="type-icon">📞</span><span data-i18n="type_phone"></span></button>
+          <button class="type-btn locked" onclick="requirePremium()"><span class="type-icon">📶</span><span data-i18n="type_wifi"></span></button>
+          <button class="type-btn locked" onclick="requirePremium()"><span class="type-icon">👤</span><span data-i18n="type_contact"></span></button>
+          <button class="type-btn locked" onclick="requirePremium()"><span class="type-icon">💬</span><span data-i18n="type_sms"></span></button>
+          <button class="type-btn locked" onclick="requirePremium()"><span class="type-icon">📍</span><span data-i18n="type_location"></span></button>
         </div>
-
-        <div id="fields-url">
-          <label>URL do link</label>
-          <input type="url" id="f-url" placeholder="https://exemplo.com" oninput="liveUpdate()">
+        <div id="fields-url" class="field">
+          <label data-i18n="url_label"></label>
+          <input type="url" id="f-url" oninput="liveUpdate()">
         </div>
-        <div id="fields-text" style="display:none">
-          <label>Texto</label>
-          <textarea id="f-text" placeholder="Escreve o teu texto..." oninput="liveUpdate()"></textarea>
+        <div id="fields-text" class="field" style="display:none">
+          <label data-i18n="text_label"></label>
+          <textarea id="f-text" oninput="liveUpdate()"></textarea>
         </div>
         <div id="fields-email" style="display:none">
-          <label>Endereço de email</label>
-          <input type="text" id="f-email" placeholder="nome@exemplo.com" oninput="liveUpdate()">
-          <label style="margin-top:10px">Assunto (opcional)</label>
-          <input type="text" id="f-email-subj" placeholder="Assunto" oninput="liveUpdate()">
+          <div class="field">
+            <label data-i18n="email_label"></label>
+            <input type="text" id="f-email" oninput="liveUpdate()">
+          </div>
+          <div class="field">
+            <label data-i18n="subject_label"></label>
+            <input type="text" id="f-email-subj" oninput="liveUpdate()">
+          </div>
         </div>
-        <div id="fields-phone" style="display:none">
-          <label>Número de telefone</label>
-          <input type="text" id="f-phone" placeholder="+351 912 345 678" oninput="liveUpdate()">
+        <div id="fields-phone" class="field" style="display:none">
+          <label data-i18n="phone_label"></label>
+          <input type="text" id="f-phone" oninput="liveUpdate()">
         </div>
       </div>
     </div>
 
-    <!-- PERSONALIZAÇÃO -->
     <div class="panel">
       <div class="panel-header">
         <div class="panel-icon">🎨</div>
-        <span class="panel-title">Personalização</span>
+        <span class="panel-title" data-i18n="customization"></span>
       </div>
       <div class="panel-body">
-        <label>Cores</label>
-        <div class="color-row" id="color-section">
+        <label data-i18n="colors"></label>
+        <div class="color-row">
           <div class="color-field" onclick="document.getElementById('pick-fg').click()">
-            <div class="color-swatch" style="background:#000000"><input type="color" id="pick-fg" value="#000000" oninput="updateColor('fg', this.value)"></div>
-            <div><div class="color-label">QR Code</div><div class="color-value" id="val-fg">#000000</div></div>
+            <div class="color-swatch" id="swatch-fg" style="background:#000000"><input type="color" id="pick-fg" value="#000000" oninput="updateColor('fg',this.value)"></div>
+            <div><div class="color-label" data-i18n="qr_color"></div><div class="color-value" id="val-fg">#000000</div></div>
           </div>
           <div class="color-field" onclick="document.getElementById('pick-bg').click()">
-            <div class="color-swatch" id="swatch-bg" style="background:#ffffff"><input type="color" id="pick-bg" value="#ffffff" oninput="updateColor('bg', this.value)"></div>
-            <div><div class="color-label">Fundo</div><div class="color-value" id="val-bg">#ffffff</div></div>
+            <div class="color-swatch" id="swatch-bg" style="background:#ffffff"><input type="color" id="pick-bg" value="#ffffff" oninput="updateColor('bg',this.value)"></div>
+            <div><div class="color-label" data-i18n="bg_color"></div><div class="color-value" id="val-bg">#ffffff</div></div>
           </div>
         </div>
-
-        <label>Tamanho</label>
+        <label data-i18n="size"></label>
         <div class="slider-row">
           <input type="range" id="size-range" min="150" max="400" value="250" step="10" oninput="updateSize(this.value)">
           <span class="slider-val" id="size-val">250px</span>
         </div>
-
-        <button class="btn-generate" id="btn-gen" onclick="generateQR()">✦ Gerar QR Code</button>
+        <button class="btn-generate" id="btn-gen" onclick="generateQR()"><span data-i18n="generate"></span></button>
       </div>
     </div>
   </div>
@@ -214,12 +458,12 @@
   <div class="preview-panel">
     <div class="panel-header">
       <div class="panel-icon">👁️</div>
-      <span class="panel-title">Pré-visualização</span>
+      <span class="panel-title" data-i18n="preview"></span>
     </div>
     <div class="qr-display">
       <div id="qr-placeholder" class="qr-placeholder">
         <span class="qr-placeholder-icon">⬛</span>
-        <p>Preenche os campos<br>e clica em gerar</p>
+        <p data-i18n="preview_placeholder"></p>
       </div>
       <div id="qr-output">
         <div id="qr-canvas-wrapper">
@@ -227,23 +471,20 @@
         </div>
       </div>
     </div>
-
     <div class="qr-name-row" id="qr-name-row" style="display:none">
-      <input class="qr-name-input" id="qr-name" placeholder="Nome do QR code (ex: Menu do restaurante)">
+      <input class="qr-name-input" id="qr-name">
     </div>
-
     <div class="download-section" id="dl-section" style="display:none">
-      <button class="btn-dl" onclick="downloadPNG()">↓ PNG</button>
-      <button class="btn-dl" onclick="downloadSVG()">↓ SVG</button>
+      <button class="btn-dl" onclick="downloadPNG()" data-i18n="download_png"></button>
+      <button class="btn-dl" onclick="downloadSVG()" data-i18n="download_svg"></button>
     </div>
-
     <div class="premium-banner" id="premium-banner" style="display:none">
-      <div style="font-size:20px">⚡</div>
+      <div style="font-size:18px">⚡</div>
       <div class="premium-text" style="flex:1">
-        <strong>QR Dinâmicos + Analytics</strong>
-        <span>Altera o link depois · Vê cliques em tempo real</span>
+        <strong data-i18n="premium_title"></strong>
+        <span data-i18n="premium_sub"></span>
       </div>
-      <a href="pricing.html" class="btn-upgrade-small">Ver planos</a>
+      <a href="pricing.html" class="btn-upgrade-small" data-i18n="see_plans"></a>
     </div>
   </div>
 </div>
@@ -252,154 +493,162 @@
 
 <script type="module">
 import { supabase, getUser, getUserPlan, getTodayQRCount } from './js/supabase.js'
+import { t, getLang, setLang } from './js/i18n.js'
 
-let currentType = 'url'
-let qrGenerated = false
-let currentUser = null
-let userPlan = 'free'
-let todayCount = 0
+let currentType = 'url', qrGenerated = false
+let currentUser = null, userPlan = 'free', todayCount = 0
+let qrInstance = null
+
+// THEME
+const savedTheme = localStorage.getItem('theme') || 'dark'
+document.documentElement.setAttribute('data-theme', savedTheme)
+document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '🌙' : '☀️'
+
+window.toggleTheme = () => {
+  const cur = document.documentElement.getAttribute('data-theme')
+  const next = cur === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-theme', next)
+  localStorage.setItem('theme', next)
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '🌙' : '☀️'
+}
+
+// LANG
+const savedLang = getLang()
+document.getElementById('lang-btn').textContent = savedLang === 'pt' ? 'EN' : 'PT'
+document.documentElement.lang = savedLang
+
+window.toggleLang = () => {
+  const cur = getLang()
+  const next = cur === 'pt' ? 'en' : 'pt'
+  setLang(next)
+  document.getElementById('lang-btn').textContent = next === 'pt' ? 'EN' : 'PT'
+  document.documentElement.lang = next
+  applyTranslations()
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n')
+    el.textContent = t(key)
+  })
+  // Placeholders
+  const fp = { 'f-url': 'url_placeholder', 'f-text': 'text_placeholder', 'f-email': 'email_placeholder', 'f-email-subj': 'subject_placeholder', 'f-phone': 'phone_placeholder' }
+  Object.entries(fp).forEach(([id, key]) => { const el = document.getElementById(id); if(el) el.placeholder = t(key) })
+  document.getElementById('qr-name').placeholder = t('qr_name_placeholder')
+  // Nav
+  document.getElementById('btn-login-nav').textContent = t('nav_login')
+  document.getElementById('btn-logout').textContent = t('nav_logout')
+  document.getElementById('nav-dashboard').textContent = t('nav_dashboard')
+  if (userPlan === 'premium') document.getElementById('nav-plan').textContent = t('nav_premium')
+  else document.getElementById('nav-plan').textContent = t('nav_free')
+}
 
 async function init() {
+  applyTranslations()
   currentUser = await getUser()
   if (currentUser) {
     userPlan = await getUserPlan(currentUser.id)
     todayCount = await getTodayQRCount(currentUser.id)
     document.getElementById('btn-logout').style.display = 'block'
     document.getElementById('btn-login-nav').style.display = 'none'
+    document.getElementById('nav-dashboard').style.display = 'block'
+    document.getElementById('nav-plan').style.display = 'block'
     document.getElementById('limit-bar').style.display = 'block'
-    if (userPlan === 'premium') {
-      document.getElementById('nav-plan').textContent = '⚡ Premium'
-      document.getElementById('nav-plan').classList.add('premium')
-    }
+    if (userPlan === 'premium') document.getElementById('nav-plan').classList.add('premium')
     updateLimitBar()
-    unlockPremiumTypes()
   }
+  applyTranslations()
 }
 
 function updateLimitBar() {
   if (userPlan === 'premium') {
-    document.getElementById('limit-count').textContent = '∞ ilimitado'
+    document.getElementById('limit-count').textContent = t('limit_unlimited')
     document.getElementById('limit-dots').innerHTML = '⚡'
     return
   }
-  const max = 3
-  const used = Math.min(todayCount, max)
-  document.getElementById('limit-count').textContent = `${used}/${max}`
+  const used = Math.min(todayCount, 3)
+  document.getElementById('limit-count').textContent = `${used}/3`
   let dots = ''
-  for (let i = 0; i < max; i++) {
-    dots += `<div class="dot ${i < used ? 'used' : 'empty'}"></div>`
-  }
+  for (let i = 0; i < 3; i++) dots += `<div class="dot ${i < used ? 'used' : 'empty'}"></div>`
   document.getElementById('limit-dots').innerHTML = dots
 }
 
-function unlockPremiumTypes() {
-  if (userPlan !== 'premium') return
-  document.querySelectorAll('.type-btn.locked').forEach(btn => {
-    btn.classList.remove('locked')
-    const types = ['wifi','vcard','sms','location']
-    const idx = Array.from(document.querySelectorAll('.type-btn')).indexOf(btn) - 4
-    if (types[idx]) {
-      btn.onclick = () => setType(types[idx], btn)
-    }
-  })
-}
-
-window.logout = async () => {
-  await supabase.auth.signOut()
-  window.location.reload()
-}
-
-window.requirePremium = () => {
-  showToast('🔒 Funcionalidade Premium — faz upgrade!')
-  setTimeout(() => window.location.href = 'pricing.html', 1500)
-}
+window.logout = async () => { await supabase.auth.signOut(); window.location.reload() }
+window.requirePremium = () => { showToast(t('toast_premium')); setTimeout(() => window.location.href = 'pricing.html', 1500) }
 
 window.setType = (type, btn) => {
   currentType = type
   document.querySelectorAll('.type-btn:not(.locked)').forEach(b => b.classList.remove('active'))
   btn.classList.add('active')
-  ;['url','text','email','phone','wifi','vcard','sms','location'].forEach(t => {
-    const el = document.getElementById('fields-' + t)
-    if (el) el.style.display = t === type ? 'block' : 'none'
+  ;['url','text','email','phone'].forEach(tp => {
+    const el = document.getElementById('fields-' + tp)
+    if (el) el.style.display = tp === type ? 'block' : 'none'
   })
   if (qrGenerated) generateQR()
 }
 
 window.updateColor = (which, val) => {
-  if (which === 'fg') { document.getElementById('pick-fg').parentElement.style.background = val; document.getElementById('val-fg').textContent = val }
-  else { document.getElementById('swatch-bg').style.background = val; document.getElementById('val-bg').textContent = val }
+  document.getElementById(which === 'fg' ? 'swatch-fg' : 'swatch-bg').style.background = val
+  document.getElementById('val-' + which).textContent = val
   if (qrGenerated) generateQR()
 }
 
-window.updateSize = (val) => {
-  document.getElementById('size-val').textContent = val + 'px'
-  if (qrGenerated) generateQR()
-}
-
+window.updateSize = (val) => { document.getElementById('size-val').textContent = val + 'px'; if (qrGenerated) generateQR() }
 window.liveUpdate = () => { if (qrGenerated) generateQR() }
 
 function getContent() {
   switch(currentType) {
-    case 'url': return document.getElementById('f-url').value || 'https://qrcraft.io'
+    case 'url': return document.getElementById('f-url').value || 'https://qrcrafteasy.vercel.app'
     case 'text': return document.getElementById('f-text').value || 'Texto de exemplo'
-    case 'email': { const em = document.getElementById('f-email').value; const s = document.getElementById('f-email-subj').value; return s ? `mailto:${em}?subject=${encodeURIComponent(s)}` : `mailto:${em||'exemplo@email.com'}` }
+    case 'email': { const em = document.getElementById('f-email').value; const s = document.getElementById('f-email-subj').value; return `mailto:${em||'exemplo@email.com'}${s?'?subject='+encodeURIComponent(s):''}` }
     case 'phone': return 'tel:' + (document.getElementById('f-phone').value || '+351912345678')
-    case 'wifi': return `WIFI:T:WPA;S:${document.getElementById('f-wifi-ssid')?.value||'Rede'};P:${document.getElementById('f-wifi-pass')?.value||''};;`
-    case 'vcard': return `BEGIN:VCARD\nVERSION:3.0\nFN:${document.getElementById('f-vcard-name')?.value||'Nome'}\nTEL:${document.getElementById('f-vcard-tel')?.value||''}\nEMAIL:${document.getElementById('f-vcard-email')?.value||''}\nEND:VCARD`
-    case 'sms': return `smsto:${document.getElementById('f-sms-tel')?.value||''}:${document.getElementById('f-sms-msg')?.value||''}`
-    case 'location': return `geo:${document.getElementById('f-lat')?.value||'41.15'},${document.getElementById('f-lng')?.value||'-8.62'}`
-    default: return 'https://qrcraft.io'
+    default: return 'https://qrcrafteasy.vercel.app'
   }
 }
 
 window.generateQR = async () => {
-  // Check limit
   if (currentUser && userPlan === 'free' && todayCount >= 3 && !qrGenerated) {
-    showToast('🔒 Limite diário atingido! Faz upgrade para continuar.')
+    showToast(t('toast_limit'))
     setTimeout(() => window.location.href = 'pricing.html', 2000)
     return
   }
-  if (!currentUser) {
-    showToast('👤 Inicia sessão para guardar os teus QR codes!')
-  }
+  if (!currentUser) showToast(t('toast_login'))
 
   const content = getContent()
   const size = parseInt(document.getElementById('size-range').value)
   const fg = document.getElementById('pick-fg').value
   const bg = document.getElementById('pick-bg').value
 
-  document.getElementById('qrcode').innerHTML = ''
-  new QRCode(document.getElementById('qrcode'), {
-    text: content, width: size, height: size,
-    colorDark: fg, colorLight: bg,
-    correctLevel: QRCode.CorrectLevel.Q
-  })
+  const wrapper = document.getElementById('qrcode')
+  wrapper.innerHTML = ''
 
+  new QRCode(wrapper, { text: content, width: size, height: size, colorDark: fg, colorLight: bg, correctLevel: QRCode.CorrectLevel.Q })
+
+  // Fix: force canvas visible, hide img
   setTimeout(() => {
-    const canvas = document.querySelector('#qrcode canvas')
-    if (canvas) { canvas.style.display = 'block'; canvas.style.borderRadius = '4px' }
-    const img = document.querySelector('#qrcode img')
-    if (img) img.style.display = 'none'
-  }, 100)
+    const canvas = wrapper.querySelector('canvas')
+    const img = wrapper.querySelector('img')
+    if (canvas) { canvas.style.cssText = 'display:block!important;border-radius:4px;' }
+    if (img) { img.style.cssText = 'display:none!important;' }
+  }, 150)
 
   document.getElementById('qr-placeholder').style.display = 'none'
-  document.getElementById('qr-output').style.display = 'flex'
+  const output = document.getElementById('qr-output')
+  output.classList.add('visible')
   document.getElementById('dl-section').style.display = 'grid'
   document.getElementById('qr-name-row').style.display = 'block'
   document.getElementById('premium-banner').style.display = 'flex'
 
-  // Save to DB if logged in and new QR
   if (currentUser && !qrGenerated) {
-    const name = document.getElementById('qr-name').value || 'QR Code'
     await supabase.from('qr_codes').insert({
-      user_id: currentUser.id, name, type: currentType,
-      content, fg_color: fg, bg_color: bg, size, is_dynamic: false
+      user_id: currentUser.id,
+      name: document.getElementById('qr-name').value || 'QR Code',
+      type: currentType, content, fg_color: fg, bg_color: bg, size, is_dynamic: false
     })
     todayCount++
     updateLimitBar()
-    showToast('✓ QR Code guardado!')
+    showToast(t('toast_saved'))
   }
-
   qrGenerated = true
 }
 
@@ -410,7 +659,7 @@ window.downloadPNG = () => {
   link.download = 'qrcode-qrcraft.png'
   link.href = canvas.toDataURL('image/png')
   link.click()
-  showToast('✓ PNG descarregado!')
+  showToast(t('toast_png'))
 }
 
 window.downloadSVG = () => {
@@ -419,18 +668,18 @@ window.downloadSVG = () => {
   const size = parseInt(document.getElementById('size-range').value)
   const bg = document.getElementById('pick-bg').value
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size}" height="${size}"><rect width="${size}" height="${size}" fill="${bg}"/><image width="${size}" height="${size}" xlink:href="${canvas.toDataURL('image/png')}"/></svg>`
-  const blob = new Blob([svg], {type: 'image/svg+xml'})
+  const blob = new Blob([svg], {type:'image/svg+xml'})
   const link = document.createElement('a')
   link.download = 'qrcode-qrcraft.svg'
   link.href = URL.createObjectURL(blob)
   link.click()
-  showToast('✓ SVG descarregado!')
+  showToast(t('toast_svg'))
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast')
   t.textContent = msg; t.classList.add('show')
-  setTimeout(() => t.classList.remove('show'), 2500)
+  setTimeout(() => t.classList.remove('show'), 2800)
 }
 
 init()

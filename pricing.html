@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,126 +7,181 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --accent: #7c6dfa; --text: #f0f0f8; --muted: #8888aa; --radius: 16px; --radius-sm: 10px; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid var(--border); }
+  :root[data-theme="dark"] { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --text: #f0f0f8; --muted: #8888aa; --grid-line: rgba(124,109,250,0.03); }
+  :root[data-theme="light"] { --bg: #f5f5fa; --surface: #ffffff; --surface2: #f0f0f8; --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.13); --text: #0a0a0f; --muted: #666688; --grid-line: rgba(124,109,250,0.05); }
+  :root { --accent: #7c6dfa; --radius: 16px; --radius-sm: 10px; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 36px; border-bottom: 1px solid var(--border); }
   .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
-  .content { position: relative; z-index: 10; max-width: 800px; margin: 0 auto; padding: 60px 24px; }
-  .page-title { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -2px; text-align: center; margin-bottom: 8px; }
-  .page-sub { text-align: center; color: var(--muted); font-size: 17px; font-weight: 300; margin-bottom: 48px; }
-  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+  .nav-right { display: flex; gap: 8px; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; }
+  .icon-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-size: 14px; padding: 7px 10px; cursor: pointer; transition: all 0.2s; }
+  .icon-btn:hover { border-color: var(--accent); }
+
+  .content { position: relative; z-index: 10; max-width: 760px; margin: 0 auto; padding: 56px 24px; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: -2px; text-align: center; margin-bottom: 8px; animation: fadeUp 0.5s ease both; }
+  .page-sub { text-align: center; color: var(--muted); font-size: 16px; font-weight: 300; margin-bottom: 44px; animation: fadeUp 0.5s 0.1s ease both; }
+
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; animation: fadeUp 0.5s 0.2s ease both; }
+  .plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px; transition: all 0.25s; }
+  .plan-card:hover { border-color: var(--border2); transform: translateY(-2px); }
   .plan-card.featured { border: 2px solid var(--accent); position: relative; }
-  .featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #7c6dfa, #c084fc); border-radius: 100px; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 14px; white-space: nowrap; }
-  .plan-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-  .plan-price { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 4px; }
-  .plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
-  .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
-  .plan-features { list-style: none; margin-bottom: 24px; }
-  .plan-features li { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .featured-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #7c6dfa, #c084fc); border-radius: 100px; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 14px; white-space: nowrap; }
+  .plan-name { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 5px; }
+  .plan-price { font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; margin-bottom: 4px; }
+  .plan-price span { font-size: 15px; font-weight: 400; color: var(--muted); }
+  .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .plan-features { list-style: none; margin-bottom: 22px; }
+  .plan-features li { font-size: 13px; padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 7px; }
   .plan-features li:last-child { border-bottom: none; }
-  .check { color: #4ade80; font-size: 14px; }
-  .cross { color: var(--muted); font-size: 14px; }
-  .btn-plan { width: 100%; border-radius: var(--radius-sm); font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 14px; cursor: pointer; transition: opacity 0.2s; }
-  .btn-plan-free { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); }
+  .check { color: #4ade80; } .cross { color: var(--muted); }
+  .btn-plan { width: 100%; border-radius: var(--radius-sm); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; padding: 13px; cursor: pointer; transition: all 0.2s; }
+  .btn-plan-free { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); cursor: default; }
   .btn-plan-premium { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; color: #fff; }
-  .btn-plan-premium:hover { opacity: 0.9; }
-  .faq { margin-top: 56px; }
-  .faq-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; }
-  .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
-  .faq-q { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .btn-plan-premium:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,109,250,0.3); }
+
+  .faq { margin-top: 52px; animation: fadeUp 0.5s 0.3s ease both; }
+  .faq-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 18px; text-align: center; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 15px 0; }
+  .faq-q { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
   .faq-a { font-size: 13px; color: var(--muted); line-height: 1.6; }
-  @media (max-width: 600px) { .plans-grid { grid-template-columns: 1fr; } }
+
+  @media (max-width: 560px) { .plans-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <nav>
   <a href="index.html" class="logo">QRcraft</a>
-  <a href="index.html" class="nav-btn">← Voltar</a>
+  <div class="nav-right">
+    <button class="icon-btn" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <a href="index.html" class="nav-btn">← Voltar</a>
+  </div>
 </nav>
+
 <div class="content">
-  <h1 class="page-title">Planos simples e transparentes</h1>
-  <p class="page-sub">Começa grátis. Faz upgrade quando precisares de mais.</p>
+  <h1 class="page-title" id="pg-title">Planos simples e transparentes</h1>
+  <p class="page-sub" id="pg-sub">Começa grátis. Faz upgrade quando precisares de mais.</p>
 
   <div class="plans-grid">
-    <!-- FREE -->
     <div class="plan-card">
-      <div class="plan-name">Grátis</div>
-      <div class="plan-price">0€ <span>/ mês</span></div>
-      <div class="plan-desc">Para experimentar e uso pessoal</div>
-      <ul class="plan-features">
-        <li><span class="check">✓</span> 3 QR codes por dia</li>
-        <li><span class="check">✓</span> URL, Texto, Email, Telefone</li>
-        <li><span class="check">✓</span> Download PNG e SVG</li>
-        <li><span class="cross">✗</span> <span style="color:var(--muted)">QR dinâmicos</span></li>
-        <li><span class="cross">✗</span> <span style="color:var(--muted)">Analytics de cliques</span></li>
-        <li><span class="cross">✗</span> <span style="color:var(--muted)">WiFi, Contacto, SMS, Local</span></li>
-        <li><span class="cross">✗</span> <span style="color:var(--muted)">Logo personalizado</span></li>
+      <div class="plan-name" id="p1-name">Grátis</div>
+      <div class="plan-price">0€ <span id="p1-period">/ mês</span></div>
+      <div class="plan-desc" id="p1-desc">Para experimentar e uso pessoal</div>
+      <ul class="plan-features" id="p1-features">
+        <li><span class="check">✓</span> <span id="f1-1">3 QR codes por dia</span></li>
+        <li><span class="check">✓</span> <span id="f1-2">URL, Texto, Email, Telefone</span></li>
+        <li><span class="check">✓</span> <span id="f1-3">Download PNG e SVG</span></li>
+        <li><span class="cross">✗</span> <span id="f1-4" style="color:var(--muted)">QR dinâmicos</span></li>
+        <li><span class="cross">✗</span> <span id="f1-5" style="color:var(--muted)">Analytics de cliques</span></li>
+        <li><span class="cross">✗</span> <span id="f1-6" style="color:var(--muted)">WiFi, Contacto, SMS, Local</span></li>
       </ul>
-      <button class="btn-plan btn-plan-free" disabled>Plano atual</button>
+      <button class="btn-plan btn-plan-free" disabled id="btn-free">Plano atual</button>
     </div>
 
-    <!-- PREMIUM -->
     <div class="plan-card featured">
-      <div class="featured-badge">⚡ Mais popular</div>
-      <div class="plan-name">Premium</div>
-      <div class="plan-price">5€ <span>/ mês</span></div>
-      <div class="plan-desc">Para profissionais e negócios</div>
+      <div class="featured-badge" id="feat-badge">⚡ Mais popular</div>
+      <div class="plan-name" id="p2-name">Premium</div>
+      <div class="plan-price">5€ <span id="p2-period">/ mês</span></div>
+      <div class="plan-desc" id="p2-desc">Para profissionais e negócios</div>
       <ul class="plan-features">
-        <li><span class="check">✓</span> QR codes ilimitados</li>
-        <li><span class="check">✓</span> Todos os tipos de QR</li>
-        <li><span class="check">✓</span> Download PNG e SVG</li>
-        <li><span class="check">✓</span> <strong>QR dinâmicos</strong> (altera o link depois)</li>
-        <li><span class="check">✓</span> <strong>Analytics</strong> — cliques, países, dispositivos</li>
-        <li><span class="check">✓</span> WiFi, Contacto, SMS, Localização</li>
-        <li><span class="check">✓</span> Logo personalizado</li>
+        <li><span class="check">✓</span> <span id="f2-1">QR codes ilimitados</span></li>
+        <li><span class="check">✓</span> <span id="f2-2">Todos os tipos de QR</span></li>
+        <li><span class="check">✓</span> <span id="f2-3">Download PNG e SVG</span></li>
+        <li><span class="check">✓</span> <strong id="f2-4">QR dinâmicos</strong></li>
+        <li><span class="check">✓</span> <strong id="f2-5">Analytics em tempo real</strong></li>
+        <li><span class="check">✓</span> <span id="f2-6">Logo personalizado</span></li>
       </ul>
       <button class="btn-plan btn-plan-premium" id="btn-premium" onclick="startCheckout()">
-        Começar por 5€/mês
+        <span id="btn-premium-text">Começar por 5€/mês</span>
       </button>
     </div>
   </div>
 
   <div class="faq">
-    <h2 class="faq-title">Perguntas frequentes</h2>
-    <div class="faq-item">
-      <div class="faq-q">O que é um QR dinâmico?</div>
-      <div class="faq-a">Um QR dinâmico permite-te alterar o link de destino a qualquer momento, sem precisar de reimprimir o QR code. Perfeito para menus de restaurante, eventos, ou marketing.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Posso cancelar quando quiser?</div>
-      <div class="faq-a">Sim. Podes cancelar a qualquer altura diretamente no teu perfil. Não há contratos nem penalizações.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Os meus QR codes ficam a funcionar se cancelar?</div>
-      <div class="faq-a">Os QR codes estáticos ficam sempre a funcionar. Os QR dinâmicos passam para modo de leitura — o link atual fica ativo mas não podes alterá-lo.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-q">Que métodos de pagamento aceitam?</div>
-      <div class="faq-a">Cartão de crédito/débito via Stripe. Pagamento 100% seguro.</div>
-    </div>
+    <h2 class="faq-title" id="faq-title">Perguntas frequentes</h2>
+    <div class="faq-item"><div class="faq-q" id="faq-q1">O que é um QR dinâmico?</div><div class="faq-a" id="faq-a1">Um QR dinâmico permite-te alterar o link de destino a qualquer momento, sem precisar de reimprimir o QR code. Perfeito para menus de restaurante, eventos, ou marketing.</div></div>
+    <div class="faq-item"><div class="faq-q" id="faq-q2">Posso cancelar quando quiser?</div><div class="faq-a" id="faq-a2">Sim. Podes cancelar a qualquer altura diretamente no teu perfil. Não há contratos nem penalizações.</div></div>
+    <div class="faq-item"><div class="faq-q" id="faq-q3">Os meus QR codes ficam a funcionar se cancelar?</div><div class="faq-a" id="faq-a3">Os QR codes estáticos ficam sempre a funcionar. Os QR dinâmicos ficam em modo de leitura — o link atual mantém-se mas não podes alterá-lo.</div></div>
+    <div class="faq-item"><div class="faq-q" id="faq-q4">Que métodos de pagamento aceitam?</div><div class="faq-a" id="faq-a4">Cartão de crédito/débito via Stripe. Pagamento 100% seguro.</div></div>
   </div>
 </div>
 
 <script type="module">
 import { supabase, getUser } from './js/supabase.js'
+import { getLang, setLang } from './js/i18n.js'
+
+const theme = localStorage.getItem('theme') || 'dark'
+document.documentElement.setAttribute('data-theme', theme)
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '🌙' : '☀️'
+
+const lang = getLang()
+document.getElementById('lang-btn').textContent = lang === 'pt' ? 'EN' : 'PT'
+applyLang(lang)
+
+window.toggleTheme = () => {
+  const cur = document.documentElement.getAttribute('data-theme'); const next = cur === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-theme', next); localStorage.setItem('theme', next)
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '🌙' : '☀️'
+}
+
+window.toggleLang = () => {
+  const cur = getLang(); const next = cur === 'pt' ? 'en' : 'pt'
+  setLang(next); document.getElementById('lang-btn').textContent = next === 'pt' ? 'EN' : 'PT'
+  applyLang(next)
+}
+
+function applyLang(l) {
+  const isEn = l === 'en'
+  document.getElementById('pg-title').textContent = isEn ? 'Simple, transparent pricing' : 'Planos simples e transparentes'
+  document.getElementById('pg-sub').textContent = isEn ? 'Start free. Upgrade when you need more.' : 'Começa grátis. Faz upgrade quando precisares de mais.'
+  document.getElementById('p1-name').textContent = isEn ? 'Free' : 'Grátis'
+  document.getElementById('p1-period').textContent = isEn ? '/ month' : '/ mês'
+  document.getElementById('p1-desc').textContent = isEn ? 'For personal use and testing' : 'Para experimentar e uso pessoal'
+  document.getElementById('p2-period').textContent = isEn ? '/ month' : '/ mês'
+  document.getElementById('p2-desc').textContent = isEn ? 'For professionals and businesses' : 'Para profissionais e negócios'
+  document.getElementById('f1-1').textContent = isEn ? '3 QR codes per day' : '3 QR codes por dia'
+  document.getElementById('f1-3').textContent = isEn ? 'PNG and SVG download' : 'Download PNG e SVG'
+  document.getElementById('f1-4').textContent = isEn ? 'Dynamic QR codes' : 'QR dinâmicos'
+  document.getElementById('f1-5').textContent = isEn ? 'Click analytics' : 'Analytics de cliques'
+  document.getElementById('f1-6').textContent = isEn ? 'WiFi, Contact, SMS, Location' : 'WiFi, Contacto, SMS, Local'
+  document.getElementById('f2-1').textContent = isEn ? 'Unlimited QR codes' : 'QR codes ilimitados'
+  document.getElementById('f2-2').textContent = isEn ? 'All QR types' : 'Todos os tipos de QR'
+  document.getElementById('f2-3').textContent = isEn ? 'PNG and SVG download' : 'Download PNG e SVG'
+  document.getElementById('f2-4').textContent = isEn ? 'Dynamic QR codes' : 'QR dinâmicos'
+  document.getElementById('f2-5').textContent = isEn ? 'Real-time analytics' : 'Analytics em tempo real'
+  document.getElementById('f2-6').textContent = isEn ? 'Custom logo' : 'Logo personalizado'
+  document.getElementById('btn-free').textContent = isEn ? 'Current plan' : 'Plano atual'
+  document.getElementById('btn-premium-text').textContent = isEn ? 'Start for €5/month' : 'Começar por 5€/mês'
+  document.getElementById('feat-badge').textContent = isEn ? '⚡ Most popular' : '⚡ Mais popular'
+  document.getElementById('faq-title').textContent = isEn ? 'Frequently asked questions' : 'Perguntas frequentes'
+  document.getElementById('faq-q1').textContent = isEn ? 'What is a dynamic QR code?' : 'O que é um QR dinâmico?'
+  document.getElementById('faq-a1').textContent = isEn ? 'A dynamic QR code lets you change the destination link at any time, without reprinting. Perfect for restaurant menus, events, or marketing.' : 'Um QR dinâmico permite-te alterar o link de destino a qualquer momento, sem precisar de reimprimir o QR code. Perfeito para menus de restaurante, eventos, ou marketing.'
+  document.getElementById('faq-q2').textContent = isEn ? 'Can I cancel anytime?' : 'Posso cancelar quando quiser?'
+  document.getElementById('faq-a2').textContent = isEn ? 'Yes. Cancel anytime from your profile. No contracts, no penalties.' : 'Sim. Podes cancelar a qualquer altura diretamente no teu perfil. Não há contratos nem penalizações.'
+  document.getElementById('faq-q3').textContent = isEn ? 'Do my QR codes keep working if I cancel?' : 'Os meus QR codes ficam a funcionar se cancelar?'
+  document.getElementById('faq-a3').textContent = isEn ? 'Static QR codes always work. Dynamic ones go to read-only mode — the current link stays active but you can\'t change it.' : 'Os QR codes estáticos ficam sempre a funcionar. Os QR dinâmicos ficam em modo de leitura — o link atual mantém-se mas não podes alterá-lo.'
+  document.getElementById('faq-q4').textContent = isEn ? 'What payment methods do you accept?' : 'Que métodos de pagamento aceitam?'
+  document.getElementById('faq-a4').textContent = isEn ? 'Credit/debit card via Stripe. 100% secure payment.' : 'Cartão de crédito/débito via Stripe. Pagamento 100% seguro.'
+  const backBtn = document.querySelector('.nav-btn')
+  if (backBtn) backBtn.textContent = isEn ? '← Back' : '← Voltar'
+}
 
 window.startCheckout = async () => {
   const user = await getUser()
-  if (!user) {
-    window.location.href = 'login.html'
-    return
-  }
-  // Aqui vai a integração Stripe — por agora mostra mensagem
-  document.getElementById('btn-premium').textContent = 'Em breve...'
+  if (!user) { window.location.href = 'login.html'; return }
   document.getElementById('btn-premium').disabled = true
+  document.getElementById('btn-premium-text').textContent = getLang() === 'en' ? 'Coming soon...' : 'Em breve...'
   setTimeout(() => {
-    alert('Pagamento via Stripe em configuração. Volta em breve!')
-    document.getElementById('btn-premium').textContent = 'Começar por 5€/mês'
+    alert(getLang() === 'en' ? 'Stripe payment coming soon!' : 'Pagamento via Stripe em configuração. Volta em breve!')
     document.getElementById('btn-premium').disabled = false
-  }, 800)
+    document.getElementById('btn-premium-text').textContent = getLang() === 'en' ? 'Start for €5/month' : 'Começar por 5€/mês'
+  }, 600)
 }
 </script>
 </body>

@@ -1,111 +1,178 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QRcraft — Os meus QR codes</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --accent: #7c6dfa; --text: #f0f0f8; --muted: #8888aa; --radius: 16px; --radius-sm: 10px; }
-  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
-  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid var(--border); }
+  :root[data-theme="dark"] { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --text: #f0f0f8; --muted: #8888aa; --grid-line: rgba(124,109,250,0.03); }
+  :root[data-theme="light"] { --bg: #f5f5fa; --surface: #ffffff; --surface2: #f0f0f8; --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.13); --text: #0a0a0f; --muted: #666688; --grid-line: rgba(124,109,250,0.05); }
+  :root { --accent: #7c6dfa; --radius: 16px; --radius-sm: 10px; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 36px; border-bottom: 1px solid var(--border); animation: fadeIn 0.4s ease both; }
   .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
-  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: border-color 0.2s; }
-  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; }
-  .content { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
-  .page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
-  .btn-new { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; border-radius: 10px; color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; padding: 11px 20px; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
-  .btn-new:hover { opacity: 0.9; }
-  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .nav-right { display: flex; gap: 8px; align-items: center; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; transform: translateY(-1px); }
+  .icon-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-size: 14px; padding: 7px 10px; cursor: pointer; transition: all 0.2s; }
+  .icon-btn:hover { border-color: var(--accent); }
+
+  .content { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; animation: fadeUp 0.5s ease both; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -1px; }
+
+  .btn-new { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; border-radius: 10px; color: #fff; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; padding: 10px 18px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .btn-new:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,109,250,0.3); }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; animation: fadeUp 0.5s 0.1s ease both; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; transition: all 0.2s; }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
   .stat-num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; display: block; }
   .stat-label { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
-  .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-  .qr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s; }
-  .qr-card:hover { border-color: var(--border2); }
-  .qr-card-preview { padding: 20px; display: flex; justify-content: center; background: var(--surface2); border-bottom: 1px solid var(--border); min-height: 140px; align-items: center; }
-  .qr-card-preview canvas { border-radius: 6px; }
-  .qr-card-body { padding: 14px 16px; }
-  .qr-card-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+  .qr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: all 0.25s; animation: fadeUp 0.5s ease both; }
+  .qr-card:hover { border-color: rgba(124,109,250,0.3); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+
+  .qr-card-preview {
+    padding: 20px; display: flex; justify-content: center; align-items: center;
+    background: var(--surface2); border-bottom: 1px solid var(--border);
+    min-height: 130px; position: relative; overflow: hidden;
+  }
+  /* Force canvas visibility in dashboard */
+  .qr-card-preview canvas { display: block !important; border-radius: 4px; max-width: 100px; max-height: 100px; }
+  .qr-card-preview img { display: none !important; }
+
+  .qr-card-body { padding: 13px 15px; }
+  .qr-card-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .qr-card-type { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .qr-card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
   .qr-card-date { font-size: 11px; color: var(--muted); }
-  .qr-card-actions { display: flex; gap: 6px; }
-  .btn-icon { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); font-size: 13px; padding: 5px 9px; cursor: pointer; transition: all 0.15s; }
+  .qr-card-actions { display: flex; gap: 5px; }
+  .btn-icon { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); font-size: 12px; padding: 5px 8px; cursor: pointer; transition: all 0.15s; }
   .btn-icon:hover { border-color: var(--accent); color: #a78bfa; }
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-icon { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.3; }
-  .empty-state p { margin-bottom: 20px; font-size: 15px; }
-  .loading { text-align: center; padding: 40px; color: var(--muted); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); animation: fadeUp 0.5s ease both; }
+  .empty-icon { font-size: 44px; display: block; margin-bottom: 14px; opacity: 0.25; }
+  .empty-state p { margin-bottom: 20px; font-size: 14px; }
+  .loading { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--surface); border: 1px solid rgba(124,109,250,0.4); border-radius: 10px; padding: 12px 18px; font-size: 13px; color: #a78bfa; box-shadow: 0 8px 32px rgba(0,0,0,0.3); z-index: 1000; transform: translateY(80px) scale(0.9); opacity: 0; transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+
+  @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } nav { padding: 14px 16px; } }
 </style>
 </head>
 <body>
 <nav>
   <a href="index.html" class="logo">QRcraft</a>
-  <div style="display:flex;gap:10px">
-    <a href="index.html" class="nav-btn">+ Novo QR</a>
-    <button class="nav-btn" onclick="logout()">Sair</button>
+  <div class="nav-right">
+    <button class="icon-btn" id="lang-btn" onclick="toggleLang()">EN</button>
+    <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+    <a href="index.html" class="nav-btn" id="btn-new-nav">+ Novo QR</a>
+    <button class="nav-btn" id="btn-logout" onclick="logout()">Sair</button>
   </div>
 </nav>
 
 <div class="content">
   <div class="page-header">
-    <h1 class="page-title">Os meus QR codes</h1>
-    <a href="index.html" class="btn-new">+ Criar novo</a>
+    <h1 class="page-title" id="page-title">Os meus QR codes</h1>
+    <a href="index.html" class="btn-new" id="btn-new">+ Criar novo</a>
   </div>
 
   <div class="stats-grid">
     <div class="stat-card">
       <span class="stat-num" id="stat-total">—</span>
-      <span class="stat-label">QR codes criados</span>
+      <span class="stat-label" id="stat-total-label">QR codes criados</span>
     </div>
     <div class="stat-card">
       <span class="stat-num" id="stat-clicks">—</span>
-      <span class="stat-label">Cliques totais</span>
+      <span class="stat-label" id="stat-clicks-label">Cliques totais</span>
     </div>
     <div class="stat-card">
       <span class="stat-num" id="stat-plan">—</span>
-      <span class="stat-label">Plano atual</span>
+      <span class="stat-label" id="stat-plan-label">Plano atual</span>
     </div>
   </div>
 
-  <div id="qr-list">
-    <div class="loading">A carregar...</div>
-  </div>
+  <div id="qr-list"><div class="loading" id="loading-text">A carregar...</div></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<div class="toast" id="toast"></div>
+
 <script type="module">
 import { supabase, getUser, getUserPlan } from './js/supabase.js'
+import { getLang, setLang } from './js/i18n.js'
+
+// Theme
+const theme = localStorage.getItem('theme') || 'dark'
+document.documentElement.setAttribute('data-theme', theme)
+document.getElementById('theme-btn').textContent = theme === 'dark' ? '🌙' : '☀️'
+
+// Lang
+let lang = getLang()
+document.getElementById('lang-btn').textContent = lang === 'pt' ? 'EN' : 'PT'
+applyLang(lang)
+
+window.toggleTheme = () => {
+  const cur = document.documentElement.getAttribute('data-theme')
+  const next = cur === 'dark' ? 'light' : 'dark'
+  document.documentElement.setAttribute('data-theme', next)
+  localStorage.setItem('theme', next)
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '🌙' : '☀️'
+}
+
+window.toggleLang = () => {
+  const cur = getLang(); const next = cur === 'pt' ? 'en' : 'pt'
+  setLang(next); lang = next
+  document.getElementById('lang-btn').textContent = next === 'pt' ? 'EN' : 'PT'
+  applyLang(next)
+}
+
+function applyLang(l) {
+  const isEn = l === 'en'
+  document.getElementById('page-title').textContent = isEn ? 'My QR codes' : 'Os meus QR codes'
+  document.getElementById('btn-new').textContent = isEn ? '+ Create new' : '+ Criar novo'
+  document.getElementById('btn-new-nav').textContent = isEn ? '+ New QR' : '+ Novo QR'
+  document.getElementById('btn-logout').textContent = isEn ? 'Sign out' : 'Sair'
+  document.getElementById('stat-total-label').textContent = isEn ? 'QR codes created' : 'QR codes criados'
+  document.getElementById('stat-clicks-label').textContent = isEn ? 'Total clicks' : 'Cliques totais'
+  document.getElementById('stat-plan-label').textContent = isEn ? 'Current plan' : 'Plano atual'
+  document.getElementById('loading-text').textContent = isEn ? 'Loading...' : 'A carregar...'
+}
 
 async function init() {
   const user = await getUser()
   if (!user) { window.location.href = 'login.html'; return }
 
   const plan = await getUserPlan(user.id)
-  document.getElementById('stat-plan').textContent = plan === 'premium' ? '⚡ Premium' : 'Grátis'
+  const isEn = getLang() === 'en'
+  document.getElementById('stat-plan').textContent = plan === 'premium' ? '⚡ Premium' : (isEn ? 'Free' : 'Grátis')
 
   const { data: qrs, error } = await supabase
-    .from('qr_codes')
-    .select('*')
+    .from('qr_codes').select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
-  if (error) { document.getElementById('qr-list').innerHTML = '<p style="color:var(--muted);text-align:center">Erro ao carregar.</p>'; return }
+  if (error) { document.getElementById('qr-list').innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Erro ao carregar.</p>'; return }
 
   document.getElementById('stat-total').textContent = qrs.length
-  const totalClicks = qrs.reduce((sum, q) => sum + (q.clicks || 0), 0)
-  document.getElementById('stat-clicks').textContent = totalClicks
+  document.getElementById('stat-clicks').textContent = qrs.reduce((s, q) => s + (q.clicks||0), 0)
 
   if (!qrs.length) {
     document.getElementById('qr-list').innerHTML = `
       <div class="empty-state">
         <span class="empty-icon">⬛</span>
-        <p>Ainda não criaste nenhum QR code.</p>
-        <a href="index.html" class="btn-new">Criar o primeiro</a>
+        <p>${isEn ? "You haven't created any QR codes yet." : 'Ainda não criaste nenhum QR code.'}</p>
+        <a href="index.html" class="btn-new">${isEn ? 'Create the first one' : 'Criar o primeiro'}</a>
       </div>`
     return
   }
@@ -113,39 +180,50 @@ async function init() {
   const grid = document.createElement('div')
   grid.className = 'qr-grid'
 
-  qrs.forEach(qr => {
+  qrs.forEach((qr, idx) => {
     const card = document.createElement('div')
     card.className = 'qr-card'
-    const date = new Date(qr.created_at).toLocaleDateString('pt-PT')
+    card.style.animationDelay = (idx * 0.05) + 's'
+    const date = new Date(qr.created_at).toLocaleDateString(isEn ? 'en-GB' : 'pt-PT')
+    const previewId = 'preview-' + qr.id.replace(/-/g,'')
     card.innerHTML = `
-      <div class="qr-card-preview" id="preview-${qr.id}"></div>
+      <div class="qr-card-preview" id="${previewId}"></div>
       <div class="qr-card-body">
         <div class="qr-card-name">${qr.name || 'QR Code'}</div>
-        <div class="qr-card-type">${qr.type} ${qr.is_dynamic ? '· dinâmico' : ''}</div>
+        <div class="qr-card-type">${qr.type}${qr.is_dynamic ? ' · dinâmico' : ''}</div>
         <div class="qr-card-meta">
           <span class="qr-card-date">${date}</span>
           <div class="qr-card-actions">
-            <button class="btn-icon" onclick="downloadQR('${qr.id}')">↓</button>
+            <button class="btn-icon" onclick="downloadQR('${previewId}', '${qr.name||'qrcode'}')">↓</button>
             <button class="btn-icon" onclick="deleteQR('${qr.id}', this)">🗑</button>
           </div>
         </div>
       </div>`
     grid.appendChild(card)
 
-    // Render mini QR
+    // Render QR with delay to ensure DOM is ready
     setTimeout(() => {
+      const container = document.getElementById(previewId)
+      if (!container) return
       try {
-        new QRCode(document.getElementById('preview-' + qr.id), {
-          text: qr.content, width: 100, height: 100,
-          colorDark: qr.fg_color || '#000', colorLight: qr.bg_color || '#fff',
+        new QRCode(container, {
+          text: qr.content || 'https://qrcrafteasy.vercel.app',
+          width: 100, height: 100,
+          colorDark: qr.fg_color || '#000000',
+          colorLight: qr.bg_color || '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         })
+        // Force correct display after QRCode generates
         setTimeout(() => {
-          const img = document.querySelector(`#preview-${qr.id} img`)
-          if (img) img.style.display = 'none'
+          const canvas = container.querySelector('canvas')
+          const img = container.querySelector('img')
+          if (canvas) canvas.style.cssText = 'display:block!important;border-radius:4px;'
+          if (img) img.style.cssText = 'display:none!important;'
         }, 200)
-      } catch(e) {}
-    }, 50)
+      } catch(e) {
+        container.innerHTML = '<span style="font-size:32px;opacity:0.3">⬛</span>'
+      }
+    }, idx * 80 + 100)
   })
 
   document.getElementById('qr-list').innerHTML = ''
@@ -153,25 +231,31 @@ async function init() {
 }
 
 window.deleteQR = async (id, btn) => {
-  if (!confirm('Tens a certeza que queres apagar este QR code?')) return
-  btn.closest('.qr-card').style.opacity = '0.4'
+  const isEn = getLang() === 'en'
+  if (!confirm(isEn ? 'Delete this QR code?' : 'Tens a certeza que queres apagar este QR code?')) return
+  const card = btn.closest('.qr-card')
+  card.style.opacity = '0.4'; card.style.transform = 'scale(0.97)'
   const { error } = await supabase.from('qr_codes').delete().eq('id', id)
-  if (!error) btn.closest('.qr-card').remove()
-  else { btn.closest('.qr-card').style.opacity = '1'; alert('Erro ao apagar.') }
+  if (!error) { card.style.transition = 'all 0.3s'; card.style.opacity = '0'; setTimeout(() => card.remove(), 300) }
+  else { card.style.opacity = '1'; card.style.transform = '' }
 }
 
-window.downloadQR = (id) => {
-  const canvas = document.querySelector(`#preview-${id} canvas`)
-  if (!canvas) return
+window.downloadQR = (previewId, name) => {
+  const canvas = document.querySelector('#' + previewId + ' canvas')
+  if (!canvas) { showToast('⚠️ Erro ao descarregar'); return }
   const link = document.createElement('a')
-  link.download = `qrcode-${id}.png`
+  link.download = `qrcode-${name}.png`
   link.href = canvas.toDataURL('image/png')
   link.click()
+  showToast(getLang() === 'en' ? '✓ Downloaded!' : '✓ Descarregado!')
 }
 
-window.logout = async () => {
-  await supabase.auth.signOut()
-  window.location.href = 'login.html'
+window.logout = async () => { await supabase.auth.signOut(); window.location.href = 'login.html' }
+
+function showToast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg; t.classList.add('show')
+  setTimeout(() => t.classList.remove('show'), 2500)
 }
 
 init()
