@@ -153,6 +153,13 @@ async function init() {
   const user = await getUser()
   if (!user) { window.location.href = 'login.html'; return }
 
+  // Mostrar mensagem de upgrade bem sucedido
+  const params = new URLSearchParams(window.location.search)
+  if (params.get('upgraded') === '1') {
+    setTimeout(() => showToast(getLang() === 'en' ? '⚡ Welcome to Premium!' : '⚡ Bem-vindo ao Premium!'), 500)
+    window.history.replaceState({}, '', 'dashboard.html')
+  }
+
   const plan = await getUserPlan(user.id)
   const isEn = getLang() === 'en'
   document.getElementById('stat-plan').textContent = plan === 'premium' ? '⚡ Premium' : (isEn ? 'Free' : 'Grátis')

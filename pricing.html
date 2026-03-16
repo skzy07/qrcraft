@@ -175,13 +175,29 @@ function applyLang(l) {
 window.startCheckout = async () => {
   const user = await getUser()
   if (!user) { window.location.href = 'login.html'; return }
+
+  const isEn = getLang() === 'en'
   document.getElementById('btn-premium').disabled = true
-  document.getElementById('btn-premium-text').textContent = getLang() === 'en' ? 'Coming soon...' : 'Em breve...'
-  setTimeout(() => {
-    alert(getLang() === 'en' ? 'Stripe payment coming soon!' : 'Pagamento via Stripe em configuração. Volta em breve!')
+  document.getElementById('btn-premium-text').textContent = isEn ? 'Redirecting...' : 'A redirecionar...'
+
+  try {
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, email: user.email })
+    })
+    const data = await res.json()
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      throw new Error('No URL returned')
+    }
+  } catch (err) {
+    console.error(err)
+    alert(isEn ? 'Payment error. Please try again.' : 'Erro no pagamento. Tenta novamente.')
     document.getElementById('btn-premium').disabled = false
-    document.getElementById('btn-premium-text').textContent = getLang() === 'en' ? 'Start for €5/month' : 'Começar por 5€/mês'
-  }, 600)
+    document.getElementById('btn-premium-text').textContent = isEn ? 'Start for €5/month' : 'Começar por 5€/mês'
+  }
 }
 </script>
 </body>
