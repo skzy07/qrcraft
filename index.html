@@ -556,6 +556,9 @@ async function init() {
     document.getElementById('limit-bar').style.display = 'block'
     if (userPlan === 'premium') document.getElementById('nav-plan').classList.add('premium')
     updateLimitBar()
+  } else {
+    document.getElementById('btn-gen').textContent =
+      getLang() === 'en' ? '👤 Sign in to generate' : '👤 Inicia sessão para gerar'
   }
   applyTranslations()
 }
@@ -607,12 +610,17 @@ function getContent() {
 }
 
 window.generateQR = async () => {
-  if (currentUser && userPlan === 'free' && todayCount >= 3 && !qrGenerated) {
+  if (!currentUser) {
+    showToast(getLang() === 'en' ? '👤 Sign in to generate QR codes!' : '👤 Inicia sessão para gerar QR codes!')
+    setTimeout(() => window.location.href = 'login.html', 1500)
+    return
+  }
+
+  if (userPlan === 'free' && todayCount >= 3 && !qrGenerated) {
     showToast(t('toast_limit'))
     setTimeout(() => window.location.href = 'pricing.html', 2000)
     return
   }
-  if (!currentUser) showToast(t('toast_login'))
 
   const content = getContent()
   const size = parseInt(document.getElementById('size-range').value)
