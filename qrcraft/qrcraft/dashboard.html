@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRcraft — Os meus QR codes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --accent: #7c6dfa; --text: #f0f0f8; --muted: #8888aa; --radius: 16px; --radius-sm: 10px; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; transition: border-color 0.2s; }
+  .nav-btn:hover { border-color: var(--accent); color: #a78bfa; }
+  .content { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+  .btn-new { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; border-radius: 10px; color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; padding: 11px 20px; cursor: pointer; text-decoration: none; transition: opacity 0.2s; }
+  .btn-new:hover { opacity: 0.9; }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; display: block; }
+  .stat-label { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .qr-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s; }
+  .qr-card:hover { border-color: var(--border2); }
+  .qr-card-preview { padding: 20px; display: flex; justify-content: center; background: var(--surface2); border-bottom: 1px solid var(--border); min-height: 140px; align-items: center; }
+  .qr-card-preview canvas { border-radius: 6px; }
+  .qr-card-body { padding: 14px 16px; }
+  .qr-card-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qr-card-type { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .qr-card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .qr-card-date { font-size: 11px; color: var(--muted); }
+  .qr-card-actions { display: flex; gap: 6px; }
+  .btn-icon { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--muted); font-size: 13px; padding: 5px 9px; cursor: pointer; transition: all 0.15s; }
+  .btn-icon:hover { border-color: var(--accent); color: #a78bfa; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-icon { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.3; }
+  .empty-state p { margin-bottom: 20px; font-size: 15px; }
+  .loading { text-align: center; padding: 40px; color: var(--muted); }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">QRcraft</a>
+  <div style="display:flex;gap:10px">
+    <a href="index.html" class="nav-btn">+ Novo QR</a>
+    <button class="nav-btn" onclick="logout()">Sair</button>
+  </div>
+</nav>
+
+<div class="content">
+  <div class="page-header">
+    <h1 class="page-title">Os meus QR codes</h1>
+    <a href="index.html" class="btn-new">+ Criar novo</a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-num" id="stat-total">—</span>
+      <span class="stat-label">QR codes criados</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="stat-clicks">—</span>
+      <span class="stat-label">Cliques totais</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="stat-plan">—</span>
+      <span class="stat-label">Plano atual</span>
+    </div>
+  </div>
+
+  <div id="qr-list">
+    <div class="loading">A carregar...</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module">
+import { supabase, getUser, getUserPlan } from './js/supabase.js'
+
+async function init() {
+  const user = await getUser()
+  if (!user) { window.location.href = 'login.html'; return }
+
+  const plan = await getUserPlan(user.id)
+  document.getElementById('stat-plan').textContent = plan === 'premium' ? '⚡ Premium' : 'Grátis'
+
+  const { data: qrs, error } = await supabase
+    .from('qr_codes')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error) { document.getElementById('qr-list').innerHTML = '<p style="color:var(--muted);text-align:center">Erro ao carregar.</p>'; return }
+
+  document.getElementById('stat-total').textContent = qrs.length
+  const totalClicks = qrs.reduce((sum, q) => sum + (q.clicks || 0), 0)
+  document.getElementById('stat-clicks').textContent = totalClicks
+
+  if (!qrs.length) {
+    document.getElementById('qr-list').innerHTML = `
+      <div class="empty-state">
+        <span class="empty-icon">⬛</span>
+        <p>Ainda não criaste nenhum QR code.</p>
+        <a href="index.html" class="btn-new">Criar o primeiro</a>
+      </div>`
+    return
+  }
+
+  const grid = document.createElement('div')
+  grid.className = 'qr-grid'
+
+  qrs.forEach(qr => {
+    const card = document.createElement('div')
+    card.className = 'qr-card'
+    const date = new Date(qr.created_at).toLocaleDateString('pt-PT')
+    card.innerHTML = `
+      <div class="qr-card-preview" id="preview-${qr.id}"></div>
+      <div class="qr-card-body">
+        <div class="qr-card-name">${qr.name || 'QR Code'}</div>
+        <div class="qr-card-type">${qr.type} ${qr.is_dynamic ? '· dinâmico' : ''}</div>
+        <div class="qr-card-meta">
+          <span class="qr-card-date">${date}</span>
+          <div class="qr-card-actions">
+            <button class="btn-icon" onclick="downloadQR('${qr.id}')">↓</button>
+            <button class="btn-icon" onclick="deleteQR('${qr.id}', this)">🗑</button>
+          </div>
+        </div>
+      </div>`
+    grid.appendChild(card)
+
+    // Render mini QR
+    setTimeout(() => {
+      try {
+        new QRCode(document.getElementById('preview-' + qr.id), {
+          text: qr.content, width: 100, height: 100,
+          colorDark: qr.fg_color || '#000', colorLight: qr.bg_color || '#fff',
+          correctLevel: QRCode.CorrectLevel.M
+        })
+        setTimeout(() => {
+          const img = document.querySelector(`#preview-${qr.id} img`)
+          if (img) img.style.display = 'none'
+        }, 200)
+      } catch(e) {}
+    }, 50)
+  })
+
+  document.getElementById('qr-list').innerHTML = ''
+  document.getElementById('qr-list').appendChild(grid)
+}
+
+window.deleteQR = async (id, btn) => {
+  if (!confirm('Tens a certeza que queres apagar este QR code?')) return
+  btn.closest('.qr-card').style.opacity = '0.4'
+  const { error } = await supabase.from('qr_codes').delete().eq('id', id)
+  if (!error) btn.closest('.qr-card').remove()
+  else { btn.closest('.qr-card').style.opacity = '1'; alert('Erro ao apagar.') }
+}
+
+window.downloadQR = (id) => {
+  const canvas = document.querySelector(`#preview-${id} canvas`)
+  if (!canvas) return
+  const link = document.createElement('a')
+  link.download = `qrcode-${id}.png`
+  link.href = canvas.toDataURL('image/png')
+  link.click()
+}
+
+window.logout = async () => {
+  await supabase.auth.signOut()
+  window.location.href = 'login.html'
+}
+
+init()
+</script>
+</body>
+</html>

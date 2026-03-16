@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRcraft — Planos</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0a0a0f; --surface: #13131a; --surface2: #1c1c26; --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.13); --accent: #7c6dfa; --text: #f0f0f8; --muted: #8888aa; --radius: 16px; --radius-sm: 10px; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(124,109,250,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(124,109,250,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  nav { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid var(--border); }
+  .logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+  .content { position: relative; z-index: 10; max-width: 800px; margin: 0 auto; padding: 60px 24px; }
+  .page-title { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -2px; text-align: center; margin-bottom: 8px; }
+  .page-sub { text-align: center; color: var(--muted); font-size: 17px; font-weight: 300; margin-bottom: 48px; }
+  .plans-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
+  .plan-card.featured { border: 2px solid var(--accent); position: relative; }
+  .featured-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #7c6dfa, #c084fc); border-radius: 100px; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 14px; white-space: nowrap; }
+  .plan-name { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .plan-price { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+  .plan-price span { font-size: 16px; font-weight: 400; color: var(--muted); }
+  .plan-desc { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .plan-features { list-style: none; margin-bottom: 24px; }
+  .plan-features li { font-size: 14px; padding: 7px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .plan-features li:last-child { border-bottom: none; }
+  .check { color: #4ade80; font-size: 14px; }
+  .cross { color: var(--muted); font-size: 14px; }
+  .btn-plan { width: 100%; border-radius: var(--radius-sm); font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 14px; cursor: pointer; transition: opacity 0.2s; }
+  .btn-plan-free { background: var(--surface2); border: 1px solid var(--border2); color: var(--muted); }
+  .btn-plan-premium { background: linear-gradient(135deg, #7c6dfa, #c084fc); border: none; color: #fff; }
+  .btn-plan-premium:hover { opacity: 0.9; }
+  .faq { margin-top: 56px; }
+  .faq-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 16px 0; }
+  .faq-q { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .faq-a { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  @media (max-width: 600px) { .plans-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">QRcraft</a>
+  <a href="index.html" class="nav-btn">← Voltar</a>
+</nav>
+<div class="content">
+  <h1 class="page-title">Planos simples e transparentes</h1>
+  <p class="page-sub">Começa grátis. Faz upgrade quando precisares de mais.</p>
+
+  <div class="plans-grid">
+    <!-- FREE -->
+    <div class="plan-card">
+      <div class="plan-name">Grátis</div>
+      <div class="plan-price">0€ <span>/ mês</span></div>
+      <div class="plan-desc">Para experimentar e uso pessoal</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> 3 QR codes por dia</li>
+        <li><span class="check">✓</span> URL, Texto, Email, Telefone</li>
+        <li><span class="check">✓</span> Download PNG e SVG</li>
+        <li><span class="cross">✗</span> <span style="color:var(--muted)">QR dinâmicos</span></li>
+        <li><span class="cross">✗</span> <span style="color:var(--muted)">Analytics de cliques</span></li>
+        <li><span class="cross">✗</span> <span style="color:var(--muted)">WiFi, Contacto, SMS, Local</span></li>
+        <li><span class="cross">✗</span> <span style="color:var(--muted)">Logo personalizado</span></li>
+      </ul>
+      <button class="btn-plan btn-plan-free" disabled>Plano atual</button>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="plan-card featured">
+      <div class="featured-badge">⚡ Mais popular</div>
+      <div class="plan-name">Premium</div>
+      <div class="plan-price">5€ <span>/ mês</span></div>
+      <div class="plan-desc">Para profissionais e negócios</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> QR codes ilimitados</li>
+        <li><span class="check">✓</span> Todos os tipos de QR</li>
+        <li><span class="check">✓</span> Download PNG e SVG</li>
+        <li><span class="check">✓</span> <strong>QR dinâmicos</strong> (altera o link depois)</li>
+        <li><span class="check">✓</span> <strong>Analytics</strong> — cliques, países, dispositivos</li>
+        <li><span class="check">✓</span> WiFi, Contacto, SMS, Localização</li>
+        <li><span class="check">✓</span> Logo personalizado</li>
+      </ul>
+      <button class="btn-plan btn-plan-premium" id="btn-premium" onclick="startCheckout()">
+        Começar por 5€/mês
+      </button>
+    </div>
+  </div>
+
+  <div class="faq">
+    <h2 class="faq-title">Perguntas frequentes</h2>
+    <div class="faq-item">
+      <div class="faq-q">O que é um QR dinâmico?</div>
+      <div class="faq-a">Um QR dinâmico permite-te alterar o link de destino a qualquer momento, sem precisar de reimprimir o QR code. Perfeito para menus de restaurante, eventos, ou marketing.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Posso cancelar quando quiser?</div>
+      <div class="faq-a">Sim. Podes cancelar a qualquer altura diretamente no teu perfil. Não há contratos nem penalizações.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Os meus QR codes ficam a funcionar se cancelar?</div>
+      <div class="faq-a">Os QR codes estáticos ficam sempre a funcionar. Os QR dinâmicos passam para modo de leitura — o link atual fica ativo mas não podes alterá-lo.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Que métodos de pagamento aceitam?</div>
+      <div class="faq-a">Cartão de crédito/débito via Stripe. Pagamento 100% seguro.</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { supabase, getUser } from './js/supabase.js'
+
+window.startCheckout = async () => {
+  const user = await getUser()
+  if (!user) {
+    window.location.href = 'login.html'
+    return
+  }
+  // Aqui vai a integração Stripe — por agora mostra mensagem
+  document.getElementById('btn-premium').textContent = 'Em breve...'
+  document.getElementById('btn-premium').disabled = true
+  setTimeout(() => {
+    alert('Pagamento via Stripe em configuração. Volta em breve!')
+    document.getElementById('btn-premium').textContent = 'Começar por 5€/mês'
+    document.getElementById('btn-premium').disabled = false
+  }, 800)
+}
+</script>
+</body>
+</html>
